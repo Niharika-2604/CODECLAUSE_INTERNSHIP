@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Assessment Result - Heart Disease Risk{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Result Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="fas fa-clipboard-check me-3 text-primary"></i>
+                    Assessment Result
+                </h1>
+                <p class="lead text-muted">Your heart disease risk assessment has been completed</p>
+            </div>
+
+            <!-- Risk Result Card -->
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="card-title mb-3">
+                                {% if result.prediction == 1 %}
+                                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                                    High Risk of Heart Disease
+                                {% else %}
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Low Risk of Heart Disease
+                                {% endif %}
+                            </h3>
+                            <p class="card-text">
+                                Based on the health metrics you provided, our machine learning model has assessed your heart disease risk.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="risk-indicator {{ 'risk-high' if result.prediction == 1 else 'risk-low' }} p-3 rounded">
+                                <h2 class="mb-2">
+                                    {% if result.prediction == 1 %}
+                                        <i class="fas fa-heart-broken fa-2x"></i>
+                                    {% else %}
+                                        <i class="fas fa-heart fa-2x"></i>
+                                    {% endif %}
+                                </h2>
+                                <h4 class="mb-1">{{ result.risk_level }}</h4>
+                                <p class="mb-0">Confidence: {{ result.confidence }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2 text-primary"></i>
+                        Your Health Metrics Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Age:</strong></td>
+                                    <td>{{ result.data.age }} years</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sex:</strong></td>
+                                    <td>{{ "Male" if result.data.sex == 1 else "Female" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Blood Pressure:</strong></td>
+                                    <td>{{ result.data.resting_bp }} mmHg</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cholesterol:</strong></td>
+                                    <td>{{ result.data.cholesterol }} mg/dL</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Max Heart Rate:</strong></td>
+                                    <td>{{ result.data.max_hr }} bpm</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Chest Pain:</strong></td>
+                                    <td>
+                                        {% if result.data.chest_pain_type == 0 %}Typical Angina
+                                        {% elif result.data.chest_pain_type == 1 %}Atypical Angina
+                                        {% elif result.data.chest_pain_type == 2 %}Non-anginal Pain
+                                        {% else %}Asymptomatic{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Exercise Angina:</strong></td>
+                                    <td>{{ "Yes" if result.data.exercise_angina == 1 else "No" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Blood Sugar:</strong></td>
+                                    <td>{{ ">120 mg/dL" if result.data.fasting_bs == 1 else "≤120 mg/dL" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ST Depression:</strong></td>
+                                    <td>{{ result.data.oldpeak }} mm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ST Slope:</strong></td>
+                                    <td>
+                                        {% if result.data.st_slope == 0 %}Upsloping
+                                        {% elif result.data.st_slope == 1 %}Flat
+                                        {% else %}Downsloping{% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-primary"></i>
+                        Recommendations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if result.prediction == 1 %}
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>High Risk Detected</h6>
+                            <p class="mb-0">Based on your assessment, you have an elevated risk of heart disease. Please consider the following recommendations:</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <i class="fas fa-user-md text-primary me-2"></i>
+                                <strong>Consult a Healthcare Provider:</strong> Schedule an appointment with your doctor for a comprehensive cardiovascular evaluation.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-heartbeat text-primary me-2"></i>
+                                <strong>Monitor Vital Signs:</strong> Regularly check your blood pressure, cholesterol, and blood sugar levels.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-dumbbell text-primary me-2"></i>
+                                <strong>Exercise Regularly:</strong> Engage in moderate aerobic exercise for at least 150 minutes per week.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-apple-alt text-primary me-2"></i>
+                                <strong>Healthy Diet:</strong> Follow a heart-healthy diet low in saturated fats, cholesterol, and sodium.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-smoking-ban text-primary me-2"></i>
+                                <strong>Lifestyle Changes:</strong> Quit smoking, limit alcohol consumption, and manage stress effectively.
+                            </li>
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-check-circle me-2"></i>Low Risk Detected</h6>
+                            <p class="mb-0">Great news! Your assessment indicates a low risk of heart disease. Continue maintaining a healthy lifestyle:</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <i class="fas fa-running text-success me-2"></i>
+                                <strong>Maintain Physical Activity:</strong> Continue regular exercise and physical activity.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-leaf text-success me-2"></i>
+                                <strong>Healthy Eating:</strong> Keep following a balanced, nutritious diet.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-calendar-check text-success me-2"></i>
+                                <strong>Regular Check-ups:</strong> Continue with routine health screenings and check-ups.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-balance-scale text-success me-2"></i>
+                                <strong>Maintain Healthy Weight:</strong> Keep your weight within a healthy range.
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-bed text-success me-2"></i>
+                                <strong>Quality Sleep:</strong> Ensure adequate sleep and stress management.
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-redo me-2"></i>
+                    New Assessment
+                </a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline-primary btn-lg me-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Learn More
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    View Dashboard
+                </a>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="alert alert-info mt-4">
+                <h6><i class="fas fa-info-circle me-2"></i>Important Disclaimer</h6>
+                <p class="mb-0">
+                    This assessment is for educational purposes only and should not replace professional medical advice. 
+                    The results are based on a machine learning model and may not be 100% accurate. 
+                    Always consult with a qualified healthcare provider for proper diagnosis and treatment.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
